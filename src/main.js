@@ -33,6 +33,12 @@ Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 
+
+import API from '@/api';
+Vue.prototype.$API = API;
+console.log(API);
+;
+
 Vue.config.productionTip = false
 
 new Vue({
