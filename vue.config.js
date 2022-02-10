@@ -35,9 +35,16 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
+    } ,
+    // before: require('./mock/mock-server.js')
+    // 代理跨域
+    proxy: {
+      '/dev-api': {
+        target: 'http://39.98.123.211',
+        pathRewrite: { '^/dev-api': '' },
+      },
     },
-    before: require('./mock/mock-server.js')
-  },
+  }, 
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
