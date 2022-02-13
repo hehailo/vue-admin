@@ -36,8 +36,10 @@ Vue.use(ElementUI, { locale })
 
 import API from '@/api';
 Vue.prototype.$API = API;
-console.log(API);
-;
+
+
+import CategorySelect from '@/components/CategorySelect'
+Vue.component(CategorySelect.name,CategorySelect)
 
 Vue.config.productionTip = false
 
