@@ -2,7 +2,7 @@
   <div>
     <!-- 上部分 -->
     <el-card style="margin: 10px 10px">
-      <CategorySelect @getCategoryId="getListData" :show="isShowTable"></CategorySelect>
+      <CategorySelect @getCategoryId="getListData" :show="!isShowTable"></CategorySelect>
     </el-card>
     <!-- 下部分 -->
     <el-card style="margin: 20px 10px">

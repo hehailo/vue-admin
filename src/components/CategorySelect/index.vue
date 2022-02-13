@@ -6,7 +6,7 @@
           v-model="cForm.category1Id"
           placeholder="请选择"
           @change="getList2"
-          :disabled="!show"
+          :disabled="show"
         >
           <el-option
             :label="item.name"
@@ -22,7 +22,7 @@
           v-model="cForm.category2Id"
           placeholder="请选择"
           @change="getList3"
-            :disabled="!show"
+            :disabled="show"
         >
           <el-option
             :label="item2.name"
@@ -33,7 +33,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="三级分类">
-        <el-select v-model="cForm.category3Id" placeholder="请选择" :disabled="!show">
+        <el-select v-model="cForm.category3Id" placeholder="请选择" :disabled="show">
           <el-option
             :label="item3.name"
             :value="item3.id"

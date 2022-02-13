@@ -1,10 +1,15 @@
 <template>
-  <div>Sku</div>
+    <div>SKU</div>
 </template>
 
 <script>
 export default {
-    name:'Sku'
+    name:'Sku',
+    methods:{
+      getListData(){
+
+      }
+    }
 }
 </script>
 
