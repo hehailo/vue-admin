@@ -1,17 +1,22 @@
 <template>
   <div>
-    <el-card>
+    <el-card style="margin: 10px 0px">
       <CategorySelect @getCategoryId="getListData"></CategorySelect>
     </el-card>
-    <el-card>
-      <div>
+    <el-card style="margin: 10px 0px">
+      <div v-show="scene == 0">
         <el-button
           type="primary"
-          style="margin-top: 10px "
+          style="margin-top: 10px"
           :disabled="!category3Id"
+          @click="addSpu"
           >+ 添加SPU</el-button
         >
-        <el-table :data="spulist" style="width: 100%;margin-top:10px" border="">
+        <el-table
+          :data="spulist"
+          style="width: 100%; margin-top: 10px"
+          border=""
+        >
           <el-table-column
             type="index"
             label="序号"
@@ -63,34 +68,48 @@
         </el-table>
         <!-- 分页器 -->
         <el-pagination
-          style="text-align:center;margin-top:10px"
+          style="text-align: center; margin-top: 10px"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="page"
           :page-sizes="[10, 20, 50]"
           :page-size="limit"
           layout=" prev, pager, next, jumper,->,sizes,total"
-          :total="total">
+          :total="total"
+        >
         </el-pagination>
       </div>
-      
+      <!-- 点击 修改、添加的时候 切换场景 -->
+      <SpuForm
+        v-show="scene == 1"
+        ref="spu"
+        @changeScene="changeScene"
+      ></SpuForm>
+      <SkuForm v-show="scene == 2" ref="sku"></SkuForm>
     </el-card>
   </div>
 </template>
 
 <script>
+import SkuForm from "./SkuForm";
+import SpuForm from "./SpuForm";
 export default {
   name: "Spu",
   data() {
     return {
+      scene: 0,
       category1Id: "",
       category2Id: "",
       category3Id: "",
-      page:1,
-      limit:3,
-      total:0,
+      page: 1,
+      limit: 3,
+      total: 0,
       spulist: [],
     };
+  },
+  components: {
+    SkuForm,
+    SpuForm,
   },
   methods: {
     getListData(params) {
@@ -107,18 +126,33 @@ export default {
       if (result.code == 200) {
         this.total = result.data.total;
         this.spulist = result.data.records;
-        console.log("SPU列表",result);
+        console.log("SPU列表", result);
       }
     },
-    handleCurrentChange(page){
-      console.log("page",page);
+    handleCurrentChange(page) {
+      console.log("page", page);
     },
-    handleSizeChange(limit){
-      console.log("limit",limit);
+    handleSizeChange(limit) {
+      console.log("limit", limit);
     },
 
-    addSku(row) {},
-    updateSpu(row) {},
+    addSku(row) {
+      this.scene = 2;
+    },
+    addSpu() {
+      this.scene = 1;
+    },
+    updateSpu(row) {
+      this.scene = 1;
+      //给组件打一个ref 就可以获取组件实例对象
+      // 可以操作子组件的方法和数据
+      this.$refs.spu.initData(row);
+    },
+    // 自定义事件回调
+    // 子组件取消
+    changeScene(scene) {
+      this.scene = scene;
+    },
     handler(row) {},
     deleteSpu(row) {},
   },
