@@ -25,7 +25,7 @@
         ></el-input>
       </el-form-item>
       <!-- 照片墙 -->
-      <el-form-item label="SPU图片">
+      <el-form-item label="SPU图片" style="width:90%">
         <!-- upload组件 -->
         <el-upload
           action="/dev-api/admin/product/fileUpload"
@@ -42,16 +42,79 @@
           <img width="100%" :src="dialogImageUrl" alt="" />
         </el-dialog>
       </el-form-item>
-      <el-form-item label="">
-        <el-button type="primary">保存</el-button>
-        <el-button @click="$emit('changeScene', 0)">取消</el-button>
-      </el-form-item>
+      <!-- 销售属性 -->
       <el-form-item label="销售属性">
-          <el-select v-model="attrId" :placeholder="`还有${canSelectAttr.length}未选择`">
-              <el-option :label="canselect.name" :value="`${canselect.name}:${canselect.id}`" v-for="(canselect) in canSelectAttr" :key="canselect.id"> </el-option>
-          </el-select>
+        <!-- 销售属性下拉列表 可选择 -->
+        <el-select
+          v-model="attrId"
+          :placeholder="`还有${canSelectAttr.length}未选择`"
+        >
+          <el-option
+            :label="canselect.name"
+            :value="`${canselect.name}:${canselect.id}`"
+            v-for="canselect in canSelectAttr"
+            :key="canselect.id"
+          >
+          </el-option>
+        </el-select>
+        <!-- attrId 是下拉框手机的数据 没有数据就是没有选择 需要给他置灰 -->
+        <el-button style="margin-left: 10px" type="primary" :disabled="!attrId"
+          >+ 增加销售属性</el-button
+        >
+        <!-- 增加销售属性 下拉列表 -->
+        <el-table
+          :data="spu.spuSaleAttrList"
+          style="width: 80%; margin-top: 5px"
+          border
+        >
+          <el-table-column type="index" label="序号" width="100">
+          </el-table-column>
+          <el-table-column prop="saleAttrName" label="属性名" width="200">
+          </el-table-column>
+          <!-- 属性名称列表  -->
+          <el-table-column prop="prop" label="属性名称列表" width="width">
+            <template slot-scope="{ row }">
+              <el-tag
+                :key="tag.id"
+                v-for="(tag,index) in row.spuSaleAttrValueList"
+                closable
+                :disable-transitions="true"
+                type="warning"
+                effect="dark"
+                @close="handleClose(row.spuSaleAttrValueList,index)"
+              >
+                {{ tag.saleAttrValueName }}
+              </el-tag>
+              <el-input
+                class="input-new-tag"
+                v-if="inputVisible"
+                v-model="inputValue"
+                ref="saveTagInput"
+                size="small"
+                @keyup.enter.native="handleInputConfirm"
+                @blur="handleInputConfirm"
+              >
+              </el-input>
+              <el-button
+                v-else
+                class="button-new-tag"
+                size="small"
+                @click="showInput"
+                >+ 新增</el-button
+              >
+            </template>
+          </el-table-column>
+          <el-table-column prop="prop" label="操作" width="200">
+            <template slot-scope="{ row }">
+              <el-button type="danger" icon="el-icon-delete"></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-form-item>
-      {{ canSelectAttr }}
+      <el-form-item label="">
+        <el-button type="primary" size="medium">保存</el-button>
+        <el-button size="medium" @click="$emit('changeScene', 0)">取消</el-button>
+      </el-form-item>
     </el-form>
   </div>
 </template>
@@ -76,7 +139,9 @@ export default {
       tmId: "",
       //全部属性
       saleAttrList: [],
-      attrId:''
+      attrId: "",
+      inputVisible: false,
+      inputValue: "",
     };
   },
   methods: {
@@ -118,29 +183,53 @@ export default {
         this.saleAttrList = saleResult.data;
       }
     },
+
+    // 处理照片墙有关
+    // 删除图片
     handleRemove(file, fileList) {
       this.spuImageList = fileList;
     },
+    // 预览图片
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
+    // 成功上传图片
     handleAvatarSuccess(response, file, fileList) {
       fileList[fileList.length - 1].url = response.data;
       this.spuImageList = fileList;
-      console.log("response", response);
-      console.log("file", file);
-      console.log("fileList", fileList);
+      console.log("成功上传图片的fileList", fileList);
+    },
+
+    // 动态编辑标签
+    handleClose(tagList,index) {
+      tagList.splice(index,1);
+    },
+
+    showInput() {
+      this.inputVisible = true;
+      this.$nextTick((_) => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+
+    handleInputConfirm() {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        this.dynamicTags.push(inputValue);
+      }
+      this.inputVisible = false;
+      this.inputValue = "";
     },
   },
   computed: {
     //可选属性
     canSelectAttr() {
-       return this.saleAttrList.filter((item)=>{
-          return this.spu.spuSaleAttrList.every((item2)=>{
-              return item.name  != item2.saleAttrName
-           })
-       })
+      return this.saleAttrList.filter((item) => {
+        return this.spu.spuSaleAttrList.every((item2) => {
+          return item.name != item2.saleAttrName;
+        });
+      });
     },
   },
 };
@@ -149,5 +238,20 @@ export default {
 <style scoped>
 .inputWidth {
   width: 600px;
+}
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
 }
 </style>

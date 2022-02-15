@@ -125,6 +125,6 @@ export default {
 
 <style scoped>
     .el-form-item{
-        margin-bottom: 10px;
+        margin: 10px;
     }
 </style>

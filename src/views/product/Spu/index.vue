@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-card style="margin: 10px 0px">
+    <el-card style="margin: 10px 0px;padding:10px">
       <CategorySelect @getCategoryId="getListData"></CategorySelect>
     </el-card>
-    <el-card style="margin: 10px 0px">
+    <el-card style="margin: 10px 0px;padding:10px">
       <div v-show="scene == 0">
         <el-button
           type="primary"
